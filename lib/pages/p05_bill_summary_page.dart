@@ -55,7 +55,6 @@ class BillSummary extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('บันทึกบิลสำเร็จแล้ว')),
                 );
-                // กลับไปยังหน้าสร้างบิล และอาจจะ pop หน้าสร้างบิลไปหน้า Home
                 Navigator.pop(context, true); 
               },
               icon: const Icon(Icons.save),

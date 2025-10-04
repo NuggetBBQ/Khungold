@@ -43,6 +43,8 @@ class _CreateSubBillState extends State<CreateSubBill> {
     
     final summary = BillCalculation(
       participantCost: costs,
+
+      
       total: _totalSelectedAmount,
     );
     

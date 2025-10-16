@@ -215,7 +215,7 @@ class _CreateBillState extends State<CreateBill> {
     final result = await showDialog(
       context: context,
       builder: (context) {
-        return AddItemDialog(participants: _participants);
+        return AddItemPage(participants: _participants);
       },
     );
 

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:khungold/models/bill_models.dart';
+import 'package:khungold/services/constants.dart';
 
 class BillCard extends StatelessWidget {
   const BillCard({
@@ -9,6 +11,8 @@ class BillCard extends StatelessWidget {
     this.yourOwe,
     this.paidByYou,
     this.isSummary = false,
+    this.category,
+    this.billStatus,
   });
 
   final VoidCallback onTap;
@@ -17,6 +21,14 @@ class BillCard extends StatelessWidget {
   final double? yourOwe;
   final bool? paidByYou;
   final bool isSummary;
+  final BillCategory? category;
+  final String? billStatus;
+
+  String get _categoryDisplay {
+    if (category == null) return '';
+    final index = BillCategory.values.indexWhere((e) => e == category);
+    return index >= 0 && index < billCategories.length ? billCategories[index] : '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,12 +54,37 @@ class BillCard extends StatelessWidget {
     );
   }
 
+  Widget _buildStatusTag(BuildContext context, ColorScheme cs, String status) { 
+    Color color;
+    if (status == 'ปิดบิล') {
+      color = Colors.green.shade700;
+    } else if (status == 'กำลังเก็บ') {
+      color = Colors.orange.shade700;
+    } else {
+      color = cs.outline;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      margin: const EdgeInsets.only(bottom: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color, width: 0.5),
+      ),
+      child: Text(
+        status,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color, fontWeight: FontWeight.bold), 
+      ),
+    );
+}
+
   Widget _CardData(BuildContext context, ColorScheme cs) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const Text(
-          'ยอดที่คุณต้องจ่ายรวม',
+          'รวมยอดที่รอเรียกเก็บเงิน',
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         Text(
@@ -69,6 +106,7 @@ class BillCard extends StatelessWidget {
     double displayYourOwe,
   ) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(iconData, color: iconColor),
         const SizedBox(width: 16),
@@ -76,12 +114,21 @@ class BillCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (billStatus != null) _buildStatusTag(context, cs, billStatus!), 
+              
               Text(
                 title ?? 'รายการบิล',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
               ),
+              if (_categoryDisplay.isNotEmpty)
+                Text(
+                  _categoryDisplay,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: cs.onSurfaceVariant,
+                      ),
+                ),
               const SizedBox(height: 4),
               Text('รวมบิล: ${totalAmount?.toStringAsFixed(2) ?? '0.00'} บาท'),
             ],
@@ -92,7 +139,7 @@ class BillCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              displayYourOwe > 0.0 ? 'คุณต้องจ่าย' : 'คุณจะได้รับ',
+              displayYourOwe > 0.0 ? 'รอเรียกเก็บเงิน' : 'รอเรียกเก็บเงิน',
               style: Theme.of(context).textTheme.labelSmall,
             ),
             Text(

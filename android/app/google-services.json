@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "310732420549",
+    "project_id": "khungolddb",
+    "storage_bucket": "khungolddb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:310732420549:android:befccb5d007357afd747ac",
+        "android_client_info": {
+          "package_name": "com.example.khungold"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIFJF9S_CPYMFKL_-RyACIHxhMDVbbA-s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

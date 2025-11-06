@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:khungold/models/bill_models.dart';
+import 'package:khungold/models/contact_model.dart';
+import 'package:khungold/services/data_service.dart';
 
 class BillSummary extends StatelessWidget {
   final BillCalculation summary;
 
-  const BillSummary({super.key, required this.summary});
+  final String billName; 
+  final String category; 
+  final List<Contact> selectedContacts; 
+  final List<BillItem> billItems;
 
+  const BillSummary({
+    super.key,
+    required this.summary,
+    required this.billName, 
+    required this.category,
+    required this.selectedContacts,
+    required this.billItems,
+  });
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +64,20 @@ class BillSummary extends StatelessWidget {
             ),
             
             ElevatedButton.icon(
-              onPressed: () {
+              onPressed: () async {
+                final me = await DataService.getMe();
+
+                final bill = Bill.fromCreation(
+                  title: billName,
+                  owner: me,
+                  selectedContacts: selectedContacts,
+                  summary: summary,
+                  items: billItems,
+                  category: category,
+                );
+
+                await DataService.saveBill(bill, billItems);
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('บันทึกบิลสำเร็จแล้ว')),
                 );

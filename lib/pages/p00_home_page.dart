@@ -11,8 +11,7 @@ class HomeScreen extends StatelessWidget {
     {'label': 'หารแอพ (Subscription)', 'icon': Icons.rocket_launch, 'route': '/sub/create'},
     {'label': 'บิลทั้งหมด', 'icon': Icons.receipt_long, 'route': '/bills/all'},
     {'label': 'รายการ Subscriptions', 'icon': Icons.apps, 'route': '/subs/list'},
-    {'label': 'บิลที่ฉันต้องจ่าย', 'icon': Icons.payments, 'route': '/bills/payer'},
-    {'label': 'บิลที่ฉันสร้าง', 'icon': Icons.receipt, 'route': '/bills/owner'},
+    {'label': 'รายชื่อเพื่อน', 'icon': Icons.person_2, 'route': '/contacts/list'},
   ];
 
   @override
@@ -45,23 +44,16 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _handleNavigation(BuildContext context, String route) {
-    if (route == '/sub/create') {
-      final subscriptionsData = DataService.getSubscriptions(); 
+    if (route == '/subs/list') {
+      final subscriptionsData = DataService.getSubscriptions();
       Navigator.pushNamed(
         context,
         route, 
         arguments: subscriptionsData, 
       );
     } 
-    else if (route == '/bills/payer') {
-      final Bill bill = DataService.getPayerBill(); 
-      Navigator.pushNamed(context, '/bill/detail', arguments: bill);
-    }
-    else if (route == '/bills/owner') {
-      final Bill bill = DataService.getOwnerBill(); 
-      Navigator.pushNamed(context, '/bill/detail', arguments: bill);
-    }
     else {
+
       Navigator.pushNamed(context, route);
     }
   }

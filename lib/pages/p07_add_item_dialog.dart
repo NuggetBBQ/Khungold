@@ -44,7 +44,7 @@ class _AddItemPageState extends State<AddItemPage> {
       final newItem = BillItem(
         name: _nameController.text,
         price: double.parse(_priceController.text),
-        participantIds: _selectedIds,
+        participantContactIds: _selectedIds,
       );
       
       Navigator.pop(context, newItem); 
@@ -85,13 +85,13 @@ class _AddItemPageState extends State<AddItemPage> {
                 ),
                 ...widget.participants.map((p) => CheckboxListTile(
                       title: Text(p.name),
-                      value: _selectedIds.contains(p.id),
+                      value: _selectedIds.contains(p.contactId), 
                       onChanged: (bool? isChecked) {
                         setState(() {
                           if (isChecked == true) {
-                            _selectedIds.add(p.id);
+                            _selectedIds.add(p.contactId);
                           } else {
-                            _selectedIds.remove(p.id);
+                            _selectedIds.remove(p.contactId);
                           }
                         });
                       },

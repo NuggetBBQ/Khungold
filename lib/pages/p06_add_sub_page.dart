@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:khungold/models/subscription_models.dart';
+import 'package:khungold/services/data_service.dart';
+import 'package:uuid/uuid.dart';
 
 class AddSub extends StatefulWidget {
-  const AddSub({super.key});
+  final Subscription? subToEdit;
+  
+  const AddSub({super.key, this.subToEdit});
   
   @override
   State<AddSub> createState() => _AddSubState();
@@ -13,32 +17,117 @@ class _AddSubState extends State<AddSub> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
-
+  
+  String _saveId = '';
   String _saveName = '';
   double _savePrice = 0;
+  String _selectedIconUrl = ''; 
+  
+  bool get isEditing => widget.subToEdit != null;
 
-  void _submitForm() {
+  final List<String> _iconChoices = const [
+    'https://cdn-icons-png.flaticon.com/128/5968/5968617.png',
+    'https://cdn-icons-png.flaticon.com/128/717/717421.png',
+    'https://cdn-icons-png.flaticon.com/128/3669/3669688.png',
+    'https://cdn-icons-png.flaticon.com/128/9116/9116712.png',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    if (isEditing) {
+      _saveId = widget.subToEdit!.id;
+      _nameController.text = widget.subToEdit!.name;
+      _priceController.text = widget.subToEdit!.price.toString();
+      _selectedIconUrl = widget.subToEdit!.imageUrl; 
+    } else {
+      _saveId = const Uuid().v4(); 
+      _selectedIconUrl = _iconChoices.last; 
+    }
+  }
+
+  void _submitForm() async {
     final form = _formKey.currentState;
 
     if (form!.validate()) {
       form.save();
 
       final newSub = Subscription(
+        id: _saveId, 
         name: _saveName, 
         price: _savePrice, 
-        imageUrl: 'https://cdn-icons-png.flaticon.com/128/4063/4063291.png', 
+        imageUrl: _selectedIconUrl, 
       );
 
-      Navigator.pop(context, newSub);
+      if (isEditing) {
+        await DataService.updateSubscription(newSub);
+        ScaffoldMessenger.of(context).showSnackBar(
+           SnackBar(content: Text('แก้ไข ${newSub.name} สำเร็จ')),
+        );
+      } else {
+        await DataService.addSubscription(newSub);
+        ScaffoldMessenger.of(context).showSnackBar(
+           SnackBar(content: Text('เพิ่ม ${newSub.name} สำเร็จ')),
+        );
+      }
+
+      Navigator.pop(context, true); 
     }
+  }
+
+  void _deleteSub() async {
+    if (!isEditing) return;
+
+    await DataService.removeSubscription(widget.subToEdit!.id);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('ลบรายการ ${widget.subToEdit!.name} แล้ว')),
+    );
+    Navigator.pop(context, true); 
+  }
+
+  Widget _imagePreview(ColorScheme cs) {
+    final url = _selectedIconUrl;
+
+    return Padding(
+  padding: const EdgeInsets.only(top: 10, bottom: 20),
+  child: Center(
+    child: Container(
+      width: 50,
+      height: 50,
+      decoration: BoxDecoration(
+        border: Border.all(color: cs.outline),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Center(
+        child: Image.network(
+          url,
+          width: 50,
+          height: 50,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) =>
+              const Icon(Icons.subscriptions),
+            )
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title : const Text('เพิ่มรายการใหม่'),
+        backgroundColor: cs.inversePrimary,
+        title : Text(isEditing ? 'แก้ไขรายการสมาชิก' : 'เพิ่มรายการใหม่'),
+        actions: [
+          if (isEditing)
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: _deleteSub,
+            ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -51,7 +140,7 @@ class _AddSubState extends State<AddSub> {
                 controller: _nameController,
                 decoration: const InputDecoration(
                   labelText: 'ชื่อรายการ',
-                  hintText: 'เช่น App ABC',
+                  hintText: 'เช่น Netflix',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
@@ -84,16 +173,46 @@ class _AddSubState extends State<AddSub> {
                   _savePrice = double.tryParse(value!) ?? 0.0;
                 },
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
+              
+              Text('เลือกไอคอน', style: Theme.of(context).textTheme.titleSmall),
+              const SizedBox(height: 8),
+
+              Wrap(
+                spacing: 8.0,
+                children: _iconChoices.map((url) {
+                  final isSelected = url == _selectedIconUrl;
+                  return ChoiceChip(
+                    label: Text(url),
+                    selected: isSelected,
+                    onSelected: (bool selected) {
+                      if (selected) {
+                        setState(() {
+                          _selectedIconUrl = url;
+                        });
+                      }
+                    },
+                  );
+                }).toList(),
+              ),
+
+              _imagePreview(cs),
+              const SizedBox(height: 20),
 
               ElevatedButton(
                 onPressed: _submitForm,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 15),
-                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                  backgroundColor: cs.inversePrimary,
                 ),
-                child: const Text('บันทึกรายการ'),
+                child: Text(isEditing ? 'บันทึกการแก้ไข' : 'บันทึกรายการ'),
               ),
+              
+              if (isEditing) 
+                TextButton(
+                  onPressed: _deleteSub,
+                  child: const Text('ลบรายการนี้', style: TextStyle(color: Colors.red)),
+                ),
             ],
           ),
         ),

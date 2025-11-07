@@ -2,16 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:khungold/models/bill_models.dart';
 import 'package:khungold/services/data_service.dart';
 
-
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   final List<Map<String, dynamic>> menuItems = const [
     {'label': 'สร้างบิลใหม่', 'icon': Icons.create, 'route': '/bill/new'},
-    {'label': 'หารแอพ (Subscription)', 'icon': Icons.rocket_launch, 'route': '/sub/create'},
+    {
+      'label': 'หารแอพ (Subscription)',
+      'icon': Icons.rocket_launch,
+      'route': '/sub/create',
+    },
     {'label': 'บิลทั้งหมด', 'icon': Icons.receipt_long, 'route': '/bills/all'},
-    {'label': 'รายการ Subscriptions', 'icon': Icons.apps, 'route': '/subs/list'},
-    {'label': 'รายชื่อเพื่อน', 'icon': Icons.person_2, 'route': '/contacts/list'},
+    {
+      'label': 'รายการ Subscriptions',
+      'icon': Icons.apps,
+      'route': '/subs/list',
+    },
+    {
+      'label': 'รายชื่อเพื่อน',
+      'icon': Icons.person_2,
+      'route': '/contacts/list',
+    },
+    {'label': 'Form Page', 'icon': Icons.person_2, 'route': '/formpage'},
   ];
 
   @override
@@ -46,14 +58,8 @@ class HomeScreen extends StatelessWidget {
   void _handleNavigation(BuildContext context, String route) {
     if (route == '/subs/list') {
       final subscriptionsData = DataService.getSubscriptions();
-      Navigator.pushNamed(
-        context,
-        route, 
-        arguments: subscriptionsData, 
-      );
-    } 
-    else {
-
+      Navigator.pushNamed(context, route, arguments: subscriptionsData);
+    } else {
       Navigator.pushNamed(context, route);
     }
   }

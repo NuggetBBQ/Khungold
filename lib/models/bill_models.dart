@@ -1,16 +1,31 @@
 import 'package:khungold/models/contact_model.dart';
 import 'package:uuid/uuid.dart';
 
-enum BillCategory { food, subscription, travel, accommodation, shopping, others }
+enum BillCategory {
+  food,
+  subscription,
+  travel,
+  accommodation,
+  shopping,
+  others,
+}
+
 BillCategory billCategoryFromString(String value) {
-  final index = ['food', 'subscription', 'travel', 'accommodation', 'shopping', 'others'].indexOf(value.toLowerCase());
+  final index = [
+    'food',
+    'subscription',
+    'travel',
+    'accommodation',
+    'shopping',
+    'others',
+  ].indexOf(value.toLowerCase());
   if (index == -1) return BillCategory.others;
   return BillCategory.values[index];
 }
 
 class Participant {
   Participant({
-    required this.contactId, 
+    required this.contactId,
     required this.name,
     required this.baseShare,
     required this.items,
@@ -20,12 +35,12 @@ class Participant {
   String contactId;
   String name;
   double baseShare;
-  List<String> items; 
+  List<String> items;
   bool paid;
   bool isYou;
 
   Participant copyWith({
-    String? contactId, 
+    String? contactId,
     String? name,
     double? baseShare,
     List<String>? items,
@@ -70,9 +85,15 @@ class BillItem {
   final double price;
   final List<String> participantContactIds;
 
-  BillItem ({required this.name, required this.price, required this.participantContactIds});
+  BillItem({
+    required this.name,
+    required this.price,
+    required this.participantContactIds,
+  });
 
-  double get pricePerPerson => participantContactIds.isEmpty ? 0.0 : price / participantContactIds.length;
+  double get pricePerPerson => participantContactIds.isEmpty
+      ? 0.0
+      : price / participantContactIds.length;
 
   Map<String, dynamic> toMap() {
     return {
@@ -86,7 +107,9 @@ class BillItem {
     return BillItem(
       name: data['name'] as String,
       price: (data['price'] as num).toDouble(),
-      participantContactIds: List<String>.from(data['participantContactIds'] ?? []),
+      participantContactIds: List<String>.from(
+        data['participantContactIds'] ?? [],
+      ),
     );
   }
 }
@@ -119,7 +142,7 @@ class Bill {
 
   double get baseTotal => participants.fold(0.0, (p, e) => p + e.baseShare);
   double get total => baseTotal;
-  
+
   double get yourBaseShare {
     final me = participants.where((e) => e.isYou).toList();
     if (me.isEmpty) return 0.0;
@@ -128,11 +151,12 @@ class Bill {
 
   double get myExpenditure {
     final myParticipation = participants.firstWhere(
-        (p) => p.isYou, 
-        orElse: () => Participant(contactId: '', name: 'N/A', baseShare: 0, items: [])
+      (p) => p.isYou,
+      orElse: () =>
+          Participant(contactId: '', name: 'N/A', baseShare: 0, items: []),
     );
     if (paidByYou) {
-      return myParticipation.baseShare; 
+      return myParticipation.baseShare;
     }
     return 0.0;
   }
@@ -156,7 +180,7 @@ class Bill {
   double get totalToOwe => participants
       .where((p) => p.isYou && !ownerIsYou)
       .fold(0.0, (sum, p) => sum + p.baseShare);
-      
+
   factory Bill.fromCreation({
     required String title,
     required Contact owner,
@@ -165,13 +189,17 @@ class Bill {
     required List<BillItem> items,
     required String category,
   }) {
+    //////แก้ไม่ให้ มันทับของเก่า
     final List<Participant> participants = selectedContacts.map((c) {
       final isMe = c.isMe;
       return Participant(
         contactId: c.id,
         name: c.mainName,
         baseShare: summary.participantCost[c.mainName] ?? 0.0,
-        items: items.where((item) => item.participantContactIds.contains(c.id)).map((e) => e.name).toList(),
+        items: items
+            .where((item) => item.participantContactIds.contains(c.id))
+            .map((e) => e.name)
+            .toList(),
         paid: false,
         isYou: isMe,
       );
@@ -235,7 +263,7 @@ class Bill {
       'yourTip': yourTip,
     };
   }
-  
+
   factory Bill.fromMap(Map<String, dynamic> data, String docId) {
     return Bill(
       id: docId,

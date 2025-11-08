@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:khungold/models/bill_models.dart';
 import 'package:khungold/services/data_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -23,7 +24,6 @@ class HomeScreen extends StatelessWidget {
       'icon': Icons.person_2,
       'route': '/contacts/list',
     },
-    {'label': 'Form Page', 'icon': Icons.person_2, 'route': '/formpage'},
   ];
 
   @override
@@ -51,6 +51,25 @@ class HomeScreen extends StatelessWidget {
             onTap: () => _handleNavigation(context, item['route'] as String),
           );
         },
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+          child: SizedBox(
+            height: 52,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+              },
+              child: const Text('Logout'),
+            ),
+          ),
+        ),
       ),
     );
   }

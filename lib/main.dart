@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:khungold/models/contact_model.dart';
-import 'package:khungold/pages/P12_form_pages.dart';
+import 'package:khungold/pages/P12_Login_pages.dart';
+import 'package:khungold/pages/P12_login_pages.dart';
 import 'package:khungold/pages/p08_edit_contact_page.dart';
 import 'package:khungold/pages/p09_bill_detail_payer_page.dart';
 import 'firebase_options.dart';
@@ -17,6 +18,7 @@ import 'package:khungold/pages/p10_contact_list_page.dart';
 import 'package:khungold/pages/p11_add_contact_page.dart';
 import 'package:khungold/pages/p99_blank_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:khungold/components/auth_wrapper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,10 +51,8 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      initialRoute: '/',
-
+      home: const AuthWrapper(),
       routes: {
-        '/': (_) => const HomeScreen(),
         '/bill/new': (_) => const CreateBill(),
         '/sub/create': (_) => const CreateSubBill(),
         '/bills/all': (_) => const BillsPage(),
@@ -60,7 +60,6 @@ class MyApp extends StatelessWidget {
         '/sub/add': (_) => const AddSub(),
         '/contacts/list': (_) => const ContactListPage(),
         '/contacts/add': (_) => const AddContactPage(),
-        '/formpage': (_) => FormPage(),
         '/p99': (_) => const BlankPage(),
       },
 
@@ -87,6 +86,7 @@ class MyApp extends StatelessWidget {
             builder: (_) => BillDetailPayerPage(bill: bill),
           );
         }
+        return null;
       },
     );
   }

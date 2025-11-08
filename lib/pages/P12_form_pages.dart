@@ -10,7 +10,7 @@ class FormPage extends StatefulWidget {
 class _FormPageState extends State<FormPage> {
   final _formKey = GlobalKey<FormState>();
   String? _name;
-  String? _food;
+  String? _nickname;
   String? _password;
   int? _nameLenght = 0;
   bool _showpassword = false;
@@ -32,7 +32,7 @@ class _FormPageState extends State<FormPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text("Form Page"),
+        title: Text("Get Started!"),
       ),
       body: Form(
         key: _formKey,
@@ -44,38 +44,24 @@ class _FormPageState extends State<FormPage> {
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   icon: Icon(Icons.person),
-                  hintText: 'Your Name',
-                  labelText: 'Name *',
-                  suffixText: '$_nameLenght',
+                  hintText: 'user@example.com',
+                  labelText: 'Email or Username *',
                 ),
-                onChanged: (String? value) {
+                onSaved: (String? newValue) {
+                  _name = newValue?.trim();
+                  final email = _name ?? '';
+                  final nick = email.contains('@')
+                      ? email.split('@')[0]
+                      : email;
                   setState(() {
-                    _nameLenght = value!.length;
+                    _nickname = nick;
                   });
                 },
-                onSaved: (String? newValue) {
-                  _name = newValue;
-                },
                 validator: (String? value) =>
                     _validatetTextField('Name', value, 1),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  icon: Icon(Icons.food_bank),
-                  hintText: 'Favorite Food',
-                  labelText: 'Food *',
-                ),
-                onSaved: (String? newValue) {
-                  _food = newValue;
-                },
-                validator: (String? value) =>
-                    _validatetTextField('Name', value, 1),
-              ),
-            ),
+
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
@@ -135,7 +121,7 @@ class _FormPageState extends State<FormPage> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      'Hello $_name. You like to eat $_food. Auth - $authMsg',
+                      'Hello ${_nickname ?? _name} . Auth - $authMsg',
                     ),
                   ),
                 );

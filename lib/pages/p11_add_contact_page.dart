@@ -14,26 +14,30 @@ class _AddContactPageState extends State<AddContactPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _mainNameController = TextEditingController();
   final TextEditingController _otherNamesController = TextEditingController();
-  
+
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       const uuid = Uuid();
       final newId = uuid.v4();
-      
-      final otherNames = _otherNamesController.text.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
-      
+
+      final otherNames = _otherNamesController.text
+          .split(',')
+          .map((s) => s.trim())
+          .where((s) => s.isNotEmpty)
+          .toList();
+
       final newContact = Contact(
         id: newId,
         mainName: _mainNameController.text.trim(),
         otherNames: otherNames,
       );
-      
+
       DataService.addContact(newContact);
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('บันทึก ${newContact.mainName} แล้ว')),
       );
-      Navigator.pop(context, true); 
+      Navigator.pop(context, true);
     }
   }
 
@@ -67,7 +71,7 @@ class _AddContactPageState extends State<AddContactPage> {
                 },
               ),
               const SizedBox(height: 20),
-              
+
               TextFormField(
                 controller: _otherNamesController,
                 decoration: const InputDecoration(

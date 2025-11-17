@@ -27,7 +27,9 @@ class SummaryItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final borderColor = type == 'subscription' ? cs.inversePrimary : cs.outlineVariant;
+    final borderColor = type == 'subscription'
+        ? cs.inversePrimary
+        : cs.outlineVariant;
 
     return InkWell(
       onTap: onTap,
@@ -64,7 +66,7 @@ class SummaryItemCard extends StatelessWidget {
             Text(name, style: Theme.of(context).textTheme.titleMedium),
             Text('${amount.toStringAsFixed(2)} บาท'),
           ],
-        )
+        ),
       ],
     );
   }

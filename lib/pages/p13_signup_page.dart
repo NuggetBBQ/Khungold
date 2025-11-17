@@ -1,20 +1,22 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:khungold/pages/p00_home_page.dart';
-import 'package:khungold/pages/p13_signup_page.dart';
+import 'package:khungold/models/contact_model.dart';
+import 'package:khungold/services/data_service.dart';
+import 'package:lottie/lottie.dart';
 
-class LoginPage extends StatefulWidget {
+class SignupPage extends StatefulWidget {
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
   String? _email;
   String? _password;
   String? _nickname;
   bool _showpassword = false;
+  bool _showconfirmPassword = false;
 
   Color get primaryColor => Theme.of(context).colorScheme.primary;
   Color get onPrimaryColor => Theme.of(context).colorScheme.onPrimary;
@@ -23,29 +25,19 @@ class _LoginPageState extends State<LoginPage> {
     if (value!.isEmpty) {
       return '$fieldName must not empty';
     }
-
     if (value.length <= lenght) {
       return '$fieldName must longer than $lenght char(s)';
     }
-
     return null;
+  }
+
+  void _goToSignIn() {
+    Navigator.of(context).pushReplacementNamed('/signin');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: onPrimaryColor),
-          onPressed: () {
-            Navigator.of(
-              context,
-            ).pushReplacement(MaterialPageRoute(builder: (_) => SignupPage()));
-          },
-        ),
-        backgroundColor: primaryColor,
-        elevation: 0,
-      ),
       backgroundColor: primaryColor,
       body: Center(
         child: SingleChildScrollView(
@@ -57,9 +49,13 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Lottie.network(
+                  'https://lottie.host/5897da96-e7a4-4d9f-8ed1-87e0ca36fdd9/nNCfnVGSu0.json',
+                  height: 200,
+                ),
                 SizedBox(height: 24),
                 Text(
-                  'Sign in to your Account',
+                  'Create your Account',
                   style: TextStyle(
                     color: onPrimaryColor,
                     fontSize: 28,
@@ -69,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Sign in to your Account',
+                  'Sign up to get started',
                   style: TextStyle(
                     color: onPrimaryColor.withOpacity(0.7),
                     fontSize: 16,
@@ -113,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                             });
                           },
                           validator: (String? value) =>
-                              _validatetTextField('Name', value, 1),
+                              _validatetTextField('Email', value, 1),
                         ),
                       ),
                       SizedBox(height: 20),
@@ -137,13 +133,9 @@ class _LoginPageState extends State<LoginPage> {
                               color: Colors.grey[700],
                             ),
                             suffixIcon: GestureDetector(
-                              onLongPress: () async {
+                              onTap: () async {
                                 setState(() {
-                                  _showpassword = true;
-                                });
-                                await Future.delayed(Duration(seconds: 2));
-                                setState(() {
-                                  _showpassword = false;
+                                  _showpassword = !_showpassword;
                                 });
                               },
                               child: Icon(
@@ -154,6 +146,10 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                           ),
+
+                          onChanged: (value) {
+                            _password = value;
+                          },
                           onSaved: (String? newValue) {
                             _password = newValue;
                           },
@@ -161,12 +157,62 @@ class _LoginPageState extends State<LoginPage> {
                               _validatetTextField('Password', value, 7),
                         ),
                       ),
+                      SizedBox(height: 20),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: onPrimaryColor,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: TextFormField(
+                          obscureText: !_showconfirmPassword,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 20,
+                            ),
+                            hintText: 'Confirm Password',
+                            hintStyle: TextStyle(color: Colors.grey[600]),
+                            prefixIcon: Icon(
+                              Icons.lock,
+                              color: Colors.grey[700],
+                            ),
+                            suffixIcon: GestureDetector(
+                              onTap: () async {
+                                setState(() {
+                                  _showconfirmPassword = !_showconfirmPassword;
+                                });
+                              },
+                              child: Icon(
+                                _showconfirmPassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ),
+                          validator: (String? value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Confirm Password must not empty';
+                            }
+                            if (value != _password) {
+                              return 'Passwords do not match';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
                       SizedBox(height: 32),
                       SizedBox(
                         height: 54,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueGrey,
+                            backgroundColor: const Color.fromARGB(
+                              255,
+                              34,
+                              47,
+                              43,
+                            ),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -186,37 +232,67 @@ class _LoginPageState extends State<LoginPage> {
                               return;
                             }
                             _formKey.currentState!.save();
-
+                            var authMsg = "";
                             try {
                               final credential = await FirebaseAuth.instance
-                                  .signInWithEmailAndPassword(
+                                  .createUserWithEmailAndPassword(
                                     email: _email!,
                                     password: _password!,
                                   );
-
                               if (credential.user != null) {
+                                final email = credential.user!.email ?? '';
+                                final nickname = email.contains('@')
+                                    ? email.split('@')[0]
+                                    : email;
+                                final meContact = Contact(
+                                  id: credential.user!.uid,
+                                  mainName: nickname,
+                                  isMe: true,
+                                );
+                                await DataService.addContact(meContact);
+                              }
+                              if (mounted) {
                                 Navigator.of(
                                   context,
                                 ).pushReplacementNamed('/home');
                               }
+                              return;
+                              authMsg = 'Sign up success';
                             } on FirebaseAuthException catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Sign In Failed: ${e.message}'),
-                                ),
-                              );
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'An unexpected error occurred: $e',
-                                  ),
-                                ),
-                              );
+                              authMsg = e.message!;
                             }
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Hello ${_nickname ?? _email} . Auth - $authMsg',
+                                ),
+                              ),
+                            );
                           },
-                          child: Text('Sign In'),
+                          child: Text('Create Account!'),
                         ),
+                      ),
+                      SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Already have an account?",
+                            style: TextStyle(
+                              color: onPrimaryColor.withOpacity(0.8),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: _goToSignIn,
+                            child: Text(
+                              "Sign In",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

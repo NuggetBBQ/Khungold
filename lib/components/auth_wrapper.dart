@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:khungold/pages/P12_Login_pages.dart';
 import 'package:khungold/pages/p00_home_page.dart';
+import 'package:khungold/pages/p13_signup_page.dart';
 
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({Key? key}) : super(key: key);
@@ -20,7 +21,7 @@ class AuthWrapper extends StatelessWidget {
         if (snapshot.hasData && snapshot.data != null) {
           return const HomeScreen();
         }
-        return LoginPage();
+        return SignupPage();
       },
     );
   }

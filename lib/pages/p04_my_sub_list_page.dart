@@ -4,7 +4,6 @@ import 'package:khungold/models/subscription_models.dart';
 import 'package:khungold/services/data_service.dart';
 import 'package:khungold/pages/p06_add_sub_page.dart';
 
-
 class MySubList extends StatefulWidget {
   const MySubList({super.key});
 
@@ -13,12 +12,12 @@ class MySubList extends StatefulWidget {
 }
 
 class _MySubListState extends State<MySubList> {
-  late Future<List<Subscription>> _subscriptionsFuture; 
+  late Future<List<Subscription>> _subscriptionsFuture;
 
   @override
   void initState() {
     super.initState();
-    _subscriptionsFuture = DataService.getSubscriptions(); 
+    _subscriptionsFuture = DataService.getSubscriptions();
   }
 
   void _refreshData() {
@@ -28,14 +27,12 @@ class _MySubListState extends State<MySubList> {
   }
 
   void _navigateToAddEditSub({Subscription? subToEdit}) async {
-     final result = await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => AddSub(subToEdit: subToEdit),
-        ),
-     );
-    
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => AddSub(subToEdit: subToEdit)),
+    );
+
     if (result == true) {
-       _refreshData();
+      _refreshData();
     }
   }
 
@@ -58,9 +55,9 @@ class _MySubListState extends State<MySubList> {
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('ยังไม่มีรายการสมาชิก'));
           }
-          
+
           final subscriptions = snapshot.data!;
-          
+
           return ListView.builder(
             itemCount: subscriptions.length,
             itemBuilder: (context, index) {

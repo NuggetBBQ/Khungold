@@ -15,21 +15,24 @@ class BillDetailPayerPage extends StatefulWidget {
 
 class _BillDetailPayerPageState extends State<BillDetailPayerPage> {
   final _formKey = GlobalKey<FormState>();
-  
+
   int _tipIndex = 0;
   String? _method;
 
   String _getCategoryDisplay(BillCategory category) {
     final enumString = category.toString().split('.').last;
-    final index = BillCategory.values.indexWhere((e) => e.toString().split('.').last == enumString);
-    return index != -1 && index < billCategories.length ? billCategories[index] : 'อื่นๆ';
+    final index = BillCategory.values.indexWhere(
+      (e) => e.toString().split('.').last == enumString,
+    );
+    return index != -1 && index < billCategories.length
+        ? billCategories[index]
+        : 'อื่นๆ';
   }
-  
+
   late bool _isCollector;
   late String _status;
   late String _note;
   late List<bool> _paidFlags;
-
 
   @override
   void initState() {
@@ -38,14 +41,20 @@ class _BillDetailPayerPageState extends State<BillDetailPayerPage> {
     _status = widget.bill.status;
     _note = widget.bill.note ?? '';
     _paidFlags = widget.bill.participants.map((e) => e.paid).toList();
-    
+
     if (!_isCollector && widget.bill.participants.any((p) => p.isYou)) {
-      final idx = tipChoices.indexWhere((e) => e == widget.bill.yourTip.round());
+      final idx = tipChoices.indexWhere(
+        (e) => e == widget.bill.yourTip.round(),
+      );
       _tipIndex = idx >= 0 ? idx : 0;
     }
   }
 
-  Widget _buildCollectorUI(ColorScheme cs, String dateString, String categoryDisplay) {
+  Widget _buildCollectorUI(
+    ColorScheme cs,
+    String dateString,
+    String categoryDisplay,
+  ) {
     return Column(
       children: [
         Expanded(
@@ -60,18 +69,22 @@ class _BillDetailPayerPageState extends State<BillDetailPayerPage> {
               Text(
                 widget.bill.title,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const Divider(height: 30),
-              
+
               Text(
                 'ยอดรวมบิล: ${widget.bill.total.toStringAsFixed(2)} ฿',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               Text(
                 'ยอดที่เรียกเก็บ: ${widget.bill.totalToCollect.toStringAsFixed(2)} ฿',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(color: cs.primary),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(color: cs.primary),
               ),
               const SizedBox(height: 10),
 
@@ -86,7 +99,7 @@ class _BillDetailPayerPageState extends State<BillDetailPayerPage> {
                 return SummaryItemCard(
                   type: 'participant',
                   name: p.isYou ? '${p.name} (คุณ)' : p.name,
-                  amount: p.baseShare, 
+                  amount: p.baseShare,
                   items: p.items,
                   showToggle: true,
                   paid: _paidFlags[i],
@@ -95,15 +108,18 @@ class _BillDetailPayerPageState extends State<BillDetailPayerPage> {
                   },
                 );
               }),
-              
+
               const SizedBox(height: 20),
-              
+
               DropdownButtonFormField<String>(
                 value: _status,
                 decoration: const InputDecoration(
                   labelText: 'สถานะบิล',
                   border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                 ),
                 items: ['กำลังเก็บ', 'ปิดบิล', 'ยกเลิก']
                     .map((s) => DropdownMenuItem(value: s, child: Text(s)))
@@ -113,7 +129,7 @@ class _BillDetailPayerPageState extends State<BillDetailPayerPage> {
                 },
               ),
               const SizedBox(height: 10),
-              
+
               TextFormField(
                 initialValue: _note,
                 decoration: const InputDecoration(
@@ -137,7 +153,7 @@ class _BillDetailPayerPageState extends State<BillDetailPayerPage> {
                   onPressed: () async {
                     if (!_formKey.currentState!.validate()) return;
                     _formKey.currentState!.save();
-                    
+
                     final updated = Bill(
                       id: widget.bill.id,
                       title: widget.bill.title,
@@ -150,9 +166,7 @@ class _BillDetailPayerPageState extends State<BillDetailPayerPage> {
                         widget.bill.participants.length,
                         (i) {
                           final p = widget.bill.participants[i];
-                          return p.copyWith(
-                            paid: _paidFlags[i],
-                          );
+                          return p.copyWith(paid: _paidFlags[i]);
                         },
                       ),
                       status: _status,
@@ -160,13 +174,13 @@ class _BillDetailPayerPageState extends State<BillDetailPayerPage> {
                       yourTip: widget.bill.yourTip,
                     );
 
-                    await DataService.saveBill(updated, []);
-                    
+                    await DataService.updateBill(updated);
+
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('บันทึกการเปลี่ยนแปลงแล้ว')),
                     );
                     await Future.delayed(const Duration(milliseconds: 800));
-                    if (mounted) Navigator.pop(context, updated); 
+                    if (mounted) Navigator.pop(context, updated);
                   },
                   icon: const Icon(Icons.save),
                   label: const Text('บันทึกการเปลี่ยนแปลง'),
@@ -178,8 +192,12 @@ class _BillDetailPayerPageState extends State<BillDetailPayerPage> {
       ],
     );
   }
-  
- Widget _buildPayerUI(ColorScheme cs, String dateString, String categoryDisplay) {
+
+  Widget _buildPayerUI(
+    ColorScheme cs,
+    String dateString,
+    String categoryDisplay,
+  ) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -194,11 +212,16 @@ class _BillDetailPayerPageState extends State<BillDetailPayerPage> {
             ),
             Text(
               'ยอดที่คุณต้องจ่าย: ${widget.bill.yourOweDisplay().toStringAsFixed(2)} ฿',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(color: cs.error),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(color: cs.error),
             ),
             const Text('หน้าชำระเงินถูกตัดออกเพื่อลดความซับซ้อน'),
             const SizedBox(height: 40),
-            ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('กลับสู่รายการ'))
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('กลับสู่รายการ'),
+            ),
           ],
         ),
       ),
@@ -211,21 +234,21 @@ class _BillDetailPayerPageState extends State<BillDetailPayerPage> {
     final dateString = widget.bill.date.toString().split(' ')[0];
     final categoryDisplay = _getCategoryDisplay(widget.bill.category);
     final _isCollector = widget.bill.ownerIsYou;
-    
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: cs.inversePrimary,
         title: Text(
-          _isCollector 
-          ? 'รายละเอียดบิล (รวบรวมเงิน)'
-          : 'รายละเอียดบิล (ต้องชำระ)',
+          _isCollector
+              ? 'รายละเอียดบิล (รวบรวมเงิน)'
+              : 'รายละเอียดบิล (ต้องชำระ)',
         ),
       ),
       body: Form(
         key: _formKey,
-        child: _isCollector 
-          ? _buildCollectorUI(cs, dateString, categoryDisplay) 
-          : _buildPayerUI(cs, dateString, categoryDisplay),
+        child: _isCollector
+            ? _buildCollectorUI(cs, dateString, categoryDisplay)
+            : _buildPayerUI(cs, dateString, categoryDisplay),
       ),
     );
   }

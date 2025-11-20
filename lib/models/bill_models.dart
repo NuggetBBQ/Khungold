@@ -32,6 +32,7 @@ class Participant {
     this.paid = false,
     this.isYou = false,
   });
+
   String contactId;
   String name;
   double baseShare;
@@ -128,6 +129,7 @@ class Bill {
     this.note,
     this.yourTip = 0.0,
   });
+
   String id;
   String title;
   DateTime date;
@@ -155,7 +157,7 @@ class Bill {
       orElse: () =>
           Participant(contactId: '', name: 'N/A', baseShare: 0, items: []),
     );
-    if (paidByYou) {
+    if (myParticipation.paid) {
       return myParticipation.baseShare;
     }
     return 0.0;
@@ -174,11 +176,11 @@ class Bill {
   }
 
   double get totalToCollect => participants
-      .where((p) => !p.isYou && ownerIsYou)
+      .where((p) => !p.isYou && ownerIsYou && !p.paid)
       .fold(0.0, (sum, p) => sum + p.baseShare);
 
   double get totalToOwe => participants
-      .where((p) => p.isYou && !ownerIsYou)
+      .where((p) => p.isYou && !ownerIsYou && !p.paid)
       .fold(0.0, (sum, p) => sum + p.baseShare);
 
   factory Bill.fromCreation({
@@ -189,7 +191,6 @@ class Bill {
     required List<BillItem> items,
     required String category,
   }) {
-    //////แก้ไม่ให้ มันทับของเก่า
     final List<Participant> participants = selectedContacts.map((c) {
       final isMe = c.isMe;
       return Participant(

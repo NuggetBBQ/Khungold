@@ -14,6 +14,13 @@ class BillsPage extends StatefulWidget {
 class _BillsPageState extends State<BillsPage> {
   late Future<List<Bill>> _billsFuture;
 
+  // NOTE: ตัวแปร filter ใหม่
+  String _selectedCategory = 'ทั้งหมด';
+  final List<String> _categoryFilters = [
+    'ทั้งหมด',
+    ...billCategories, // food, subscription, travel, ...
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -27,12 +34,18 @@ class _BillsPageState extends State<BillsPage> {
 
   double _getSumExpenditure(List<Bill> bills) =>
       bills.fold(0.0, (sum, b) => sum + b.myExpenditure);
+
   double _getSumCollect(List<Bill> bills) => bills
       .where((b) => b.ownerIsYou)
       .fold(0.0, (sum, b) => sum + b.totalToCollect);
 
-  List<Bill> _getAllBills(List<Bill> allBills) {
-    return allBills;
+  // NOTE: ฟังก์ชัน Filter ใหม่
+  List<Bill> _filterBills(List<Bill> bills) {
+    if (_selectedCategory == 'ทั้งหมด') return bills;
+
+    return bills.where((bill) {
+      return bill.category.toString().split('.').last == _selectedCategory;
+    }).toList();
   }
 
   Widget _buildBillList(List<Bill> bills) {
@@ -105,6 +118,31 @@ class _BillsPageState extends State<BillsPage> {
 
                 return Column(
                   children: [
+                    // NOTE: Dropdown Filter
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedCategory,
+                        decoration: const InputDecoration(
+                          labelText: 'กรองตามหมวดหมู่',
+                          border: OutlineInputBorder(),
+                        ),
+                        items: _categoryFilters.map((cat) {
+                          return DropdownMenuItem(value: cat, child: Text(cat));
+                        }).toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() {
+                              _selectedCategory = value;
+                            });
+                          }
+                        },
+                      ),
+                    ),
+
                     BillCard(
                       title: 'ยอดเงินสุทธิทั้งหมด',
                       totalAmount: sumCollect,
@@ -113,8 +151,9 @@ class _BillsPageState extends State<BillsPage> {
                       isSummary: true,
                       onTap: () {},
                     ),
+
                     Expanded(
-                      child: _buildBillList(_getAllBills(allLoadedBills)),
+                      child: _buildBillList(_filterBills(allLoadedBills)),
                     ),
                   ],
                 );

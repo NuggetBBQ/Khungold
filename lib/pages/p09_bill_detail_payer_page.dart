@@ -193,62 +193,20 @@ class _BillDetailPayerPageState extends State<BillDetailPayerPage> {
     );
   }
 
-  Widget _buildPayerUI(
-    ColorScheme cs,
-    String dateString,
-    String categoryDisplay,
-  ) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.info, size: 50, color: Colors.blueGrey),
-            const SizedBox(height: 16),
-            Text(
-              'บิลนี้คุณต้องชำระ',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            Text(
-              'ยอดที่คุณต้องจ่าย: ${widget.bill.yourOweDisplay().toStringAsFixed(2)} ฿',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(color: cs.error),
-            ),
-            const Text('หน้าชำระเงินถูกตัดออกเพื่อลดความซับซ้อน'),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('กลับสู่รายการ'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final dateString = widget.bill.date.toString().split(' ')[0];
     final categoryDisplay = _getCategoryDisplay(widget.bill.category);
-    final _isCollector = widget.bill.ownerIsYou;
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: cs.inversePrimary,
-        title: Text(
-          _isCollector
-              ? 'รายละเอียดบิล (รวบรวมเงิน)'
-              : 'รายละเอียดบิล (ต้องชำระ)',
-        ),
+        title: const Text('รายละเอียดบิล'),
       ),
       body: Form(
         key: _formKey,
-        child: _isCollector
-            ? _buildCollectorUI(cs, dateString, categoryDisplay)
-            : _buildPayerUI(cs, dateString, categoryDisplay),
+        child: _buildCollectorUI(cs, dateString, categoryDisplay),
       ),
     );
   }

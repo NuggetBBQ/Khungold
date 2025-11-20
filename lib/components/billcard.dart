@@ -27,7 +27,9 @@ class BillCard extends StatelessWidget {
   String get _categoryDisplay {
     if (category == null) return '';
     final index = BillCategory.values.indexWhere((e) => e == category);
-    return index >= 0 && index < billCategories.length ? billCategories[index] : '';
+    return index >= 0 && index < billCategories.length
+        ? billCategories[index]
+        : '';
   }
 
   @override
@@ -54,7 +56,7 @@ class BillCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusTag(BuildContext context, ColorScheme cs, String status) { 
+  Widget _buildStatusTag(BuildContext context, ColorScheme cs, String status) {
     Color color;
     if (status == 'ปิดบิล') {
       color = Colors.green.shade700;
@@ -74,10 +76,13 @@ class BillCard extends StatelessWidget {
       ),
       child: Text(
         status,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color, fontWeight: FontWeight.bold), 
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: color,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
-}
+  }
 
   Widget _CardData(BuildContext context, ColorScheme cs) {
     return Row(
@@ -90,9 +95,9 @@ class BillCard extends StatelessWidget {
         Text(
           '${totalAmount?.toStringAsFixed(2) ?? '0.00'} บาท',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: cs.primary,
-              ),
+            fontWeight: FontWeight.w700,
+            color: cs.primary,
+          ),
         ),
       ],
     );
@@ -114,20 +119,20 @@ class BillCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (billStatus != null) _buildStatusTag(context, cs, billStatus!), 
-              
+              if (billStatus != null) _buildStatusTag(context, cs, billStatus!),
+
               Text(
                 title ?? 'รายการบิล',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
               if (_categoryDisplay.isNotEmpty)
                 Text(
                   _categoryDisplay,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: cs.onSurfaceVariant,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelSmall?.copyWith(color: cs.onSurfaceVariant),
                 ),
               const SizedBox(height: 4),
               Text('รวมบิล: ${totalAmount?.toStringAsFixed(2) ?? '0.00'} บาท'),
@@ -145,9 +150,9 @@ class BillCard extends StatelessWidget {
             Text(
               displayYourOwe.toStringAsFixed(2),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: displayYourOwe > 0.0 ? cs.error : cs.tertiary,
-                  ),
+                fontWeight: FontWeight.w700,
+                color: displayYourOwe > 0.0 ? cs.error : cs.tertiary,
+              ),
             ),
           ],
         ),

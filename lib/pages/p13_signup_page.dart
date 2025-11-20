@@ -31,6 +31,19 @@ class _SignupPageState extends State<SignupPage> {
     return null;
   }
 
+  String? _validatetPassword(String fieldName, String? value, int lenght) {
+    if (value!.isEmpty) {
+      return '$fieldName must not empty';
+    }
+    if (value.length <= lenght) {
+      return '$fieldName must longer than $lenght char(s)';
+    }
+    if (value.contains(' ')) {
+      return '$fieldName must not contain spaces';
+    }
+    return null;
+  }
+
   void _goToSignIn() {
     Navigator.of(context).pushReplacementNamed('/signin');
   }
@@ -72,6 +85,7 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   textAlign: TextAlign.left,
                 ),
+
                 SizedBox(height: 32),
                 Form(
                   key: _formKey,
@@ -112,6 +126,7 @@ class _SignupPageState extends State<SignupPage> {
                               _validatetTextField('Email', value, 1),
                         ),
                       ),
+
                       SizedBox(height: 20),
                       Container(
                         decoration: BoxDecoration(
@@ -154,9 +169,10 @@ class _SignupPageState extends State<SignupPage> {
                             _password = newValue;
                           },
                           validator: (String? value) =>
-                              _validatetTextField('Password', value, 7),
+                              _validatetPassword('Password', value, 7),
                         ),
                       ),
+
                       SizedBox(height: 20),
                       Container(
                         decoration: BoxDecoration(
@@ -202,6 +218,7 @@ class _SignupPageState extends State<SignupPage> {
                           },
                         ),
                       ),
+
                       SizedBox(height: 32),
                       SizedBox(
                         height: 54,
@@ -261,6 +278,7 @@ class _SignupPageState extends State<SignupPage> {
                             } on FirebaseAuthException catch (e) {
                               authMsg = e.message!;
                             }
+
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
@@ -272,6 +290,7 @@ class _SignupPageState extends State<SignupPage> {
                           child: Text('Create Account!'),
                         ),
                       ),
+
                       SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,

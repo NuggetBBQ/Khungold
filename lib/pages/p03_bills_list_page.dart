@@ -67,6 +67,7 @@ class _BillsPageState extends State<BillsPage> {
           yourOwe: b.ownerIsYou ? b.totalToCollect : b.yourOweDisplay(),
           paidByYou: b.paidByYou,
           category: b.category,
+          billStatus: b.status,
           onTap: () async {
             final updated =
                 await Navigator.pushNamed(context, '/bill/detail', arguments: b)

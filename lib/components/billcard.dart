@@ -89,7 +89,7 @@ class BillCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const Text(
-          'รวมยอดที่รอเรียกเก็บเงิน',
+          'รอเรียกเก็บเงิน',
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         Text(

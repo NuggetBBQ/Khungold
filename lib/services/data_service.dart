@@ -23,9 +23,7 @@ class DataService {
   // Contact
   static Future<List<Contact>> getContacts() async {
     final snap = await _userDoc.collection('contacts').get();
-    return snap.docs
-        .map((d) => Contact.fromMap(d.data() as Map<String, dynamic>, d.id))
-        .toList();
+    return snap.docs.map((d) => Contact.fromMap(d.data(), d.id)).toList();
   }
 
   static Future<void> addContact(Contact contact) async {
@@ -51,7 +49,7 @@ class DataService {
           ?.map((e) => e.toString().toLowerCase())
           .toList();
       if (n == normalized || (otherNames?.contains(normalized) ?? false)) {
-        return Contact.fromMap(data as Map<String, dynamic>, d.id);
+        return Contact.fromMap(data, d.id);
       }
     }
     return null;
@@ -59,21 +57,17 @@ class DataService {
 
   static Future<Contact> getMe() async {
     final docById = await _userDoc.collection('contacts').doc(_uid).get();
-    if (docById.exists)
-      return Contact.fromMap(
-        docById.data()! as Map<String, dynamic>,
-        docById.id,
-      );
+    if (docById.exists) return Contact.fromMap(docById.data()!, docById.id);
 
     final snap = await _userDoc.collection('contacts').get();
     for (final d in snap.docs) {
-      final data = d.data() as Map<String, dynamic>;
+      final data = d.data();
       if (data['isMe'] == true) return Contact.fromMap(data, d.id);
     }
 
     if (snap.docs.isNotEmpty) {
       final d = snap.docs.first;
-      return Contact.fromMap(d.data() as Map<String, dynamic>, d.id);
+      return Contact.fromMap(d.data(), d.id);
     }
 
     final user = FirebaseAuth.instance.currentUser!;
@@ -92,21 +86,53 @@ class DataService {
 
   // Bill
   static Future<List<Bill>> getBills() async {
-    final snap = await _userDoc.collection('bills').get();
-    return snap.docs
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return [];
+    final email = user.email;
+
+    // Query bills where I am the owner
+    final ownerQuery = await _db
+        .collection('bills')
+        .where('ownerId', isEqualTo: _uid)
+        .get();
+
+    // Query bills where I am a participant (by email)
+    QuerySnapshot participantQuery;
+    if (email != null && email.isNotEmpty) {
+      participantQuery = await _db
+          .collection('bills')
+          .where('participantEmails', arrayContains: email)
+          .get();
+    } else {
+      participantQuery = await _db
+          .collection('bills')
+          .where('id', isEqualTo: 'dummy')
+          .get();
+    }
+
+    // Merge results
+    final allDocs = <String, QueryDocumentSnapshot>{};
+    for (var doc in ownerQuery.docs) {
+      allDocs[doc.id] = doc;
+    }
+    for (var doc in participantQuery.docs) {
+      allDocs[doc.id] = doc;
+    }
+
+    return allDocs.values
         .map((d) => Bill.fromMap(d.data() as Map<String, dynamic>, d.id))
         .toList();
   }
 
   static Future<void> addBill(Bill bill) async {
-    await _userDoc.collection('bills').add(bill.toMap());
+    await _db.collection('bills').add(bill.toMap());
   }
 
   static Future<void> updateBill(Bill bill) async {
-    if (bill.id == null || bill.id!.isEmpty) {
+    if (bill.id.isEmpty) {
       throw ArgumentError('Bill.id is required to update a bill');
     }
-    await _userDoc
+    await _db
         .collection('bills')
         .doc(bill.id)
         .set(bill.toMap(), SetOptions(merge: true));
@@ -115,11 +141,7 @@ class DataService {
   // Subscription
   static Future<List<Subscription>> getSubscriptions() async {
     final snap = await _userDoc.collection('subscriptions').get();
-    return snap.docs
-        .map(
-          (d) => Subscription.fromMap(d.data() as Map<String, dynamic>, d.id),
-        )
-        .toList();
+    return snap.docs.map((d) => Subscription.fromMap(d.data(), d.id)).toList();
   }
 
   static Future<void> addSubscription(Subscription sub) async {

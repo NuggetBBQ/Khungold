@@ -29,34 +29,31 @@ class _AddItemPageState extends State<AddItemPage> {
   }
 
   void _addItem() {
-    
     if (_itemFormKey.currentState!.validate()) {
       if (_selectedIds.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('โปรดเลือกผู้เข้าร่วมอย่างน้อย 1 คน'),
-                duration: Duration(seconds: 2),
-              )
+          const SnackBar(
+            content: Text('โปรดเลือกผู้เข้าร่วมอย่างน้อย 1 คน'),
+            duration: Duration(seconds: 2),
+          ),
         );
         return;
       }
-      
+
       final newItem = BillItem(
         name: _nameController.text,
         price: double.parse(_priceController.text),
         participantContactIds: _selectedIds,
       );
-      
-      Navigator.pop(context, newItem); 
+
+      Navigator.pop(context, newItem);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('เพิ่มรายการอาหาร'),
-      ),
+      appBar: AppBar(title: const Text('เพิ่มรายการอาหาร')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -75,31 +72,39 @@ class _AddItemPageState extends State<AddItemPage> {
                   controller: _priceController,
                   decoration: const InputDecoration(labelText: 'ราคา'),
                   keyboardType: TextInputType.number,
-                  validator: (v) => double.tryParse(v!) == null || double.parse(v!) <= 0
+                  validator: (v) =>
+                      double.tryParse(v!) == null || double.parse(v) <= 0
                       ? 'ระบุราคาที่ถูกต้อง'
                       : null,
                 ),
                 const Padding(
                   padding: EdgeInsets.only(top: 20, bottom: 5),
-                  child: Text('ใครต้องจ่ายรายการนี้บ้าง:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  child: Text(
+                    'ใครต้องจ่ายรายการนี้บ้าง:',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                 ),
-                ...widget.participants.map((p) => CheckboxListTile(
-                      title: Text(p.name),
-                      value: _selectedIds.contains(p.contactId), 
-                      onChanged: (bool? isChecked) {
-                        setState(() {
-                          if (isChecked == true) {
-                            _selectedIds.add(p.contactId);
-                          } else {
-                            _selectedIds.remove(p.contactId);
-                          }
-                        });
-                      },
-                      contentPadding: EdgeInsets.zero,
-                    )).toList(),
-                
+                ...widget.participants
+                    .map(
+                      (p) => CheckboxListTile(
+                        title: Text(p.name),
+                        value: _selectedIds.contains(p.contactId),
+                        onChanged: (bool? isChecked) {
+                          setState(() {
+                            if (isChecked == true) {
+                              _selectedIds.add(p.contactId);
+                            } else {
+                              _selectedIds.remove(p.contactId);
+                            }
+                          });
+                        },
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    )
+                    .toList(),
+
                 const SizedBox(height: 30),
-                
+
                 ElevatedButton(
                   onPressed: _addItem,
                   style: ElevatedButton.styleFrom(
@@ -108,9 +113,9 @@ class _AddItemPageState extends State<AddItemPage> {
                   ),
                   child: const Text('เพิ่มรายการ'),
                 ),
-                
+
                 const SizedBox(height: 10),
-                
+
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: const Text('ยกเลิก', style: TextStyle(fontSize: 16)),

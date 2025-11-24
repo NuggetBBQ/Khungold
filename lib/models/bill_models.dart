@@ -124,6 +124,7 @@ class Bill {
     required this.ownerName,
     required this.ownerIsYou,
     required this.participants,
+    required this.participantEmails,
     required this.category,
     this.status = 'กำลังเก็บ',
     this.note,
@@ -137,6 +138,7 @@ class Bill {
   String ownerName;
   bool ownerIsYou;
   List<Participant> participants;
+  List<String> participantEmails;
   BillCategory category;
   String status;
   String? note;
@@ -191,6 +193,12 @@ class Bill {
     required List<BillItem> items,
     required String category,
   }) {
+    final List<String> emails = selectedContacts
+        .map((c) => c.email)
+        .where((e) => e != null && e.isNotEmpty)
+        .cast<String>()
+        .toList();
+
     final List<Participant> participants = selectedContacts.map((c) {
       final isMe = c.isMe;
       return Participant(
@@ -214,6 +222,7 @@ class Bill {
       ownerName: owner.mainName,
       ownerIsYou: owner.isMe,
       participants: participants,
+      participantEmails: emails,
       category: billCategoryFromString(category),
       status: 'กำลังเก็บ',
       note: null,
@@ -229,6 +238,7 @@ class Bill {
     String? ownerName,
     bool? ownerIsYou,
     List<Participant>? participants,
+    List<String>? participantEmails,
     BillCategory? category,
     String? status,
     String? note,
@@ -242,6 +252,7 @@ class Bill {
       ownerName: ownerName ?? this.ownerName,
       ownerIsYou: ownerIsYou ?? this.ownerIsYou,
       participants: participants ?? this.participants,
+      participantEmails: participantEmails ?? this.participantEmails,
       category: category ?? this.category,
       status: status ?? this.status,
       note: note ?? this.note,
@@ -258,6 +269,7 @@ class Bill {
       'ownerName': ownerName,
       'ownerIsYou': ownerIsYou,
       'participants': participants.map((p) => p.toMap()).toList(),
+      'participantEmails': participantEmails,
       'category': category.toString().split('.').last,
       'status': status,
       'note': note,
@@ -276,6 +288,7 @@ class Bill {
       participants: (data['participants'] as List<dynamic>)
           .map((p) => Participant.fromMap(p as Map<String, dynamic>))
           .toList(),
+      participantEmails: List<String>.from(data['participantEmails'] ?? []),
       category: billCategoryFromString(data['category'] as String? ?? 'others'),
       status: data['status'] as String? ?? 'กำลังเก็บ',
       note: data['note'] as String?,

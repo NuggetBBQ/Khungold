@@ -13,6 +13,7 @@ class AddContactPage extends StatefulWidget {
 class _AddContactPageState extends State<AddContactPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _mainNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _otherNamesController = TextEditingController();
 
   void _submitForm() {
@@ -29,6 +30,9 @@ class _AddContactPageState extends State<AddContactPage> {
       final newContact = Contact(
         id: newId,
         mainName: _mainNameController.text.trim(),
+        email: _emailController.text.trim().isEmpty
+            ? null
+            : _emailController.text.trim(),
         otherNames: otherNames,
       );
 
@@ -69,6 +73,17 @@ class _AddContactPageState extends State<AddContactPage> {
                   }
                   return null;
                 },
+              ),
+              const SizedBox(height: 20),
+
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  labelText: 'อีเมล (Email)',
+                  hintText: 'ระบุอีเมลเพื่อนเพื่อเชื่อมต่อบัญชี',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 20),
 

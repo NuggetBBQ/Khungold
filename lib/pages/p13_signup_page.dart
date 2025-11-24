@@ -274,9 +274,10 @@ class _SignupPageState extends State<SignupPage> {
                                 ).pushReplacementNamed('/home');
                               }
                               return;
-                              authMsg = 'Sign up success';
                             } on FirebaseAuthException catch (e) {
-                              authMsg = e.message!;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Error: ${e.message}')),
+                              );
                             }
 
                             ScaffoldMessenger.of(context).showSnackBar(

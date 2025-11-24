@@ -93,6 +93,7 @@ class _CreateBillState extends State<CreateBill> {
         .toList();
 
     Contact? selectedContactToBind;
+    final TextEditingController emailController = TextEditingController();
 
     await showDialog<void>(
       context: context,
@@ -103,6 +104,17 @@ class _CreateBillState extends State<CreateBill> {
             child: ListBody(
               children: <Widget>[
                 Text('ชื่อ "$newName" ไม่ตรงกับรายชื่อหลักในสมุด'),
+                Text('ชื่อ "$newName" ไม่ตรงกับรายชื่อหลักในสมุด'),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'อีเมล (ถ้ามี)',
+                    hintText: 'ระบุอีเมลเพื่อเชื่อมต่อบัญชีเพื่อน',
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                  ),
+                ),
                 const SizedBox(height: 10),
 
                 ElevatedButton.icon(
@@ -112,6 +124,9 @@ class _CreateBillState extends State<CreateBill> {
                     final newContact = Contact(
                       id: uuid.v4(),
                       mainName: newName,
+                      email: emailController.text.trim().isEmpty
+                          ? null
+                          : emailController.text.trim(),
                     );
                     await DataService.addContact(newContact);
                     final updatedContacts = await DataService.getContacts();
@@ -401,10 +416,33 @@ class _CreateBillState extends State<CreateBill> {
             '${item.price.toStringAsFixed(2)} ฿ / หาร $participantsCount คน',
           ),
           trailing: Text('${item.pricePerPerson.toStringAsFixed(2)} ฿/คน'),
-          onLongPress: () {
-            setState(() {
-              _billItems.removeAt(index);
-            });
+          onLongPress: () async {
+            final confirm = await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('ลบรายการ?'),
+                content: Text('คุณต้องการลบรายการ "${item.name}" ใช่หรือไม่?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text('ยกเลิก'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text(
+                      'ลบ',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
+            );
+
+            if (confirm == true) {
+              setState(() {
+                _billItems.removeAt(index);
+              });
+            }
           },
         );
       },

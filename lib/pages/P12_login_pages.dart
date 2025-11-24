@@ -19,7 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   Color get primaryColor => Theme.of(context).colorScheme.primary;
   Color get onPrimaryColor => Theme.of(context).colorScheme.onPrimary;
 
-  String? _validatetTextField(String fieldName, String? value, int lenght) {
+  String? _validateTextField(String fieldName, String? value, int lenght) {
     if (value!.isEmpty) {
       return '$fieldName must not empty';
     }
@@ -69,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Sign in to your Account',
+                  'Welcome back, you\'ve been missed!',
                   style: TextStyle(
                     color: onPrimaryColor.withOpacity(0.7),
                     fontSize: 16,
@@ -113,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                             });
                           },
                           validator: (String? value) =>
-                              _validatetTextField('Name', value, 1),
+                              _validateTextField('Name', value, 1),
                         ),
                       ),
                       SizedBox(height: 20),
@@ -136,17 +136,13 @@ class _LoginPageState extends State<LoginPage> {
                               Icons.lock,
                               color: Colors.grey[700],
                             ),
-                            suffixIcon: GestureDetector(
-                              onLongPress: () async {
+                            suffixIcon: IconButton(
+                              onPressed: () {
                                 setState(() {
-                                  _showpassword = true;
-                                });
-                                await Future.delayed(Duration(seconds: 2));
-                                setState(() {
-                                  _showpassword = false;
+                                  _showpassword = !_showpassword;
                                 });
                               },
-                              child: Icon(
+                              icon: Icon(
                                 _showpassword
                                     ? Icons.visibility
                                     : Icons.visibility_off,
@@ -158,7 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                             _password = newValue;
                           },
                           validator: (String? value) =>
-                              _validatetTextField('Password', value, 7),
+                              _validateTextField('Password', value, 7),
                         ),
                       ),
                       SizedBox(height: 32),
@@ -166,7 +162,9 @@ class _LoginPageState extends State<LoginPage> {
                         height: 54,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueGrey,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.secondary,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),

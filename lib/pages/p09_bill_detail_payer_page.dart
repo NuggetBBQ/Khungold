@@ -14,7 +14,6 @@ class BillDetailPayerPage extends StatefulWidget {
 class _BillDetailPayerPageState extends State<BillDetailPayerPage> {
   final _formKey = GlobalKey<FormState>();
 
-  late bool _isCollector;
   late String _status;
   late String _note;
   late List<bool> _paidFlags;
@@ -23,7 +22,6 @@ class _BillDetailPayerPageState extends State<BillDetailPayerPage> {
   void initState() {
     super.initState();
 
-    _isCollector = widget.bill.ownerIsYou;
     _status = widget.bill.status;
     _note = widget.bill.note ?? '';
 
@@ -136,6 +134,7 @@ class _BillDetailPayerPageState extends State<BillDetailPayerPage> {
                       ownerName: widget.bill.ownerName,
                       ownerIsYou: widget.bill.ownerIsYou,
                       category: widget.bill.category,
+                      participantEmails: widget.bill.participantEmails,
                       participants: List.generate(
                         widget.bill.participants.length,
                         (i) => widget.bill.participants[i].copyWith(

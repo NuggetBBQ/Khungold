@@ -26,7 +26,7 @@ class BillSummary extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('สรุปบิล'),
-        backgroundColor: const Color.fromARGB(255, 132, 199, 136),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Padding(
@@ -73,63 +73,71 @@ class BillSummary extends StatelessWidget {
 
             ElevatedButton.icon(
               onPressed: () async {
-                final me = await DataService.getMe();
+                try {
+                  final me = await DataService.getMe();
 
-                final bill = Bill.fromCreation(
-                  title: billName,
-                  owner: me,
-                  selectedContacts: selectedContacts,
-                  summary: summary,
-                  items: billItems,
-                  category: category,
-                );
+                  final bill = Bill.fromCreation(
+                    title: billName,
+                    owner: me,
+                    selectedContacts: selectedContacts,
+                    summary: summary,
+                    items: billItems,
+                    category: category,
+                  );
 
-                await DataService.addBill(bill);
+                  await DataService.addBill(bill);
 
-                if (!context.mounted) return;
+                  if (!context.mounted) return;
 
-                showDialog<void>(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext dialogContext) {
-                    Future.delayed(const Duration(seconds: 3), () {
-                      if (Navigator.of(dialogContext).canPop()) {
-                        Navigator.of(dialogContext).pop();
-                      }
-                    });
-                    return AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Lottie.network(
-                            'https://lottie.host/15b5296b-e7bf-431c-9814-e39c991d5fc7/o0vBvWBFC3.json',
-                            height: 120,
-                            width: 120,
-                          ),
-                          const SizedBox(height: 15),
-                          const Text(
-                            'บันทึกบิลเรียบร้อย!',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                  await showDialog<void>(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext dialogContext) {
+                      Future.delayed(const Duration(seconds: 3), () {
+                        if (Navigator.of(dialogContext).canPop()) {
+                          Navigator.of(dialogContext).pop();
+                        }
+                      });
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Lottie.network(
+                              'https://lottie.host/15b5296b-e7bf-431c-9814-e39c991d5fc7/o0vBvWBFC3.json',
+                              height: 120,
+                              width: 120,
                             ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Text(
-                            'ระบบได้บันทึกบิลของคุณแล้ว',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black54,
+                            const SizedBox(height: 15),
+                            const Text(
+                              'บันทึกบิลเรียบร้อย!',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
                             ),
+                            const SizedBox(height: 5),
+                            const Text(
+                              'ระบบได้บันทึกบิลของคุณแล้ว',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(dialogContext).pop(),
+                            child: const Text('ตกลง'),
                           ),
                         ],
-                      ),
-                    );
-                  },
-                ).then((_) {
+                      );
+                    },
+                  );
+
                   if (context.mounted) {
                     Navigator.pushAndRemoveUntil(
                       context,
@@ -139,7 +147,13 @@ class BillSummary extends StatelessWidget {
                       (Route<dynamic> route) => false,
                     );
                   }
-                });
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('เกิดข้อผิดพลาด: $e')),
+                    );
+                  }
+                }
               },
               icon: const Icon(Icons.save, color: Colors.white),
               label: const Text(
@@ -151,7 +165,7 @@ class BillSummary extends StatelessWidget {
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 114, 182, 118),
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

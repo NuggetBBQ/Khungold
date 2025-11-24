@@ -1,41 +1,42 @@
 class Contact {
-  const Contact ({
+  const Contact({
     required this.id,
     required this.mainName,
+    this.email,
     this.otherNames = const [],
     this.isMe = false,
   });
 
   final String id;
   final String mainName;
+  final String? email;
   final List<String> otherNames;
   final bool isMe;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Contact &&
-          runtimeType == other.runtimeType &&
-          id == other.id;
-
+      other is Contact && runtimeType == other.runtimeType && id == other.id;
 
   @override
   int get hashCode => id.hashCode;
-  
+
   bool matchesName(String name) {
-    return mainName.toLowerCase() == name.toLowerCase() || 
-           otherNames.any((o) => o.toLowerCase() == name.toLowerCase());
+    return mainName.toLowerCase() == name.toLowerCase() ||
+        otherNames.any((o) => o.toLowerCase() == name.toLowerCase());
   }
 
   Contact copyWith({
     String? id,
     String? mainName,
+    String? email,
     List<String>? otherNames,
     bool? isMe,
   }) {
     return Contact(
       id: id ?? this.id,
       mainName: mainName ?? this.mainName,
+      email: email ?? this.email,
       otherNames: otherNames ?? this.otherNames,
       isMe: isMe ?? this.isMe,
     );
@@ -44,6 +45,7 @@ class Contact {
   Map<String, dynamic> toMap() {
     return {
       'mainName': mainName,
+      'email': email,
       'otherNames': otherNames,
       'isMe': isMe,
     };
@@ -53,6 +55,7 @@ class Contact {
     return Contact(
       id: id,
       mainName: data['mainName'] as String,
+      email: data['email'] as String?,
       otherNames: List<String>.from(data['otherNames'] ?? []),
       isMe: data['isMe'] as bool? ?? false,
     );
